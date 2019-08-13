@@ -4,12 +4,16 @@
 namespace LzoMedia\Outlet\Services;
 
 
+use Kharanenka\Scope\ExternalIDField;
 use Lovata\Shopaholic\Classes\Import\ImportOfferModelFromCSV;
 use Lovata\Shopaholic\Classes\Import\ImportProductModelFromCSV;
+use Lovata\Shopaholic\Models\Product;
 use LzoMedia\Outlet\Contracts\ImporterInterface;
 
 class PricesImporter extends ImportOfferModelFromCSV
 {
+
+    use ExternalIDField;
 
     public $json;
 
@@ -58,13 +62,53 @@ class PricesImporter extends ImportOfferModelFromCSV
      */
     public function process(){
 
+        $this->prepareImportData();
 
         parent::import($this->getItem(), false);
-
 
         return $this;
 
     }
+
+
+    /**
+     * Prepare array of import data
+     */
+    protected function prepareImportData()
+    {
+        parent::setActiveField();
+
+        $this->setProductField();
+
+        parent::setQuantityField();
+
+        parent::initPreviewImage();
+
+        parent::initImageList();
+
+        parent::prepareImportData();
+
+    }
+
+
+    public function setProductField(){
+
+        $sProductID = array_get($this->arImportData, 'product_id');
+
+        if ($sProductID === null) {
+            return;
+        }
+
+        //Find product by external ID
+        $obProduct = Product::withTrashed()->find($sProductID);
+        if (empty($obProduct)) {
+            $this->arImportData['product_id'] = null;
+        } else {
+            $this->arImportData['product_id'] = $obProduct->id;
+        }
+
+    }
+
 
 
 

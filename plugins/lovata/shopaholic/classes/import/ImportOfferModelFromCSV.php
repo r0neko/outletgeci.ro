@@ -58,6 +58,7 @@ class ImportOfferModelFromCSV extends AbstractImportModelFromCSV
     protected function setProductField()
     {
         $sProductID = array_get($this->arImportData, 'product_id');
+
         if ($sProductID === null) {
             return;
         }

@@ -14,11 +14,8 @@ Route::get('onGetOutlet', function () {
 
     $urls = [];
     for ($i = 0; $i <= 3; $i++) {
-
-        $urls[$i] = 'https://www.emag.ro/search-by-url?templates[0]=full&is_eab49=false&url=/search/geci-barbati/p' . $i;
-
+        $urls[$i] = 'https://www.emag.ro/search-by-url?templates[0]=full&is_eab49=false&url=/search/geci-dama/p' . $i;
     }
-
 
     foreach ($urls as $key => $url) {
 
@@ -33,6 +30,8 @@ Route::get('onGetOutlet', function () {
 
     foreach ($results as $key => $result) {
 
+
+
         if ($result['state'] === 'fulfilled') {
 
             $response = $result['value'];
@@ -44,12 +43,11 @@ Route::get('onGetOutlet', function () {
                 if(!is_null($json)){
 
 
-
-                    $pricesImport = new \LzoMedia\Outlet\Services\PricesImporter();
-
                     foreach ($json->data->items as $item){
 
                         $productImported = new \LzoMedia\Outlet\Services\ProductsImporter($item);
+
+                        $pricesImport = new \LzoMedia\Outlet\Services\PricesImporter();
 
                         $response = $productImported->process();
 
@@ -63,7 +61,7 @@ Route::get('onGetOutlet', function () {
 
                     }
 
-                    $responses->push($json->data->items);
+                    $responses->push($pricesImport);
 
                 }
 
@@ -79,7 +77,6 @@ Route::get('onGetOutlet', function () {
 
         } else if ($result['state'] === 'rejected') {
 
-
             logger('Rejected');
 
         } else {
@@ -92,6 +89,8 @@ Route::get('onGetOutlet', function () {
     }
 
 
+
+    dd($responses);
 
 
 
